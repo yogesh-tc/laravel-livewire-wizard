@@ -20,6 +20,8 @@ abstract class WizardComponent extends Component
     public array $allStepState = [];
     public ?string $currentStepName = null;
 
+    public int $currentStepNumber = 1;
+
     protected $listeners = [
         'previousStep',
         'nextStep',
@@ -36,20 +38,21 @@ abstract class WizardComponent extends Component
 
     public function stepNames(): Collection
     {
+        $index = 1;
         $steps = collect($this->steps())
             ->each(function (string $stepClassName) {
                 if (! is_a($stepClassName, StepComponent::class, true)) {
                     throw InvalidStepComponent::doesNotExtendStepComponent(static::class, $stepClassName);
                 }
             })
-            ->map(function (string $stepClassName) {
+            ->map(function (string $stepClassName) use(&$index) {
                 $alias = Livewire::getAlias($stepClassName);
 
                 if (is_null($alias)) {
                     throw InvalidStepComponent::notRegisteredWithLivewire(static::class, $stepClassName);
                 }
 
-                return $alias;
+                return $index++ . ' - '. $alias;
             });
 
         if ($steps->isEmpty()) {
@@ -88,7 +91,7 @@ abstract class WizardComponent extends Component
         if ($this->currentStepName) {
             $this->setStepState($this->currentStepName, $currentStepState);
         }
-
+        $this->currentStepNumber = intval(trim(substr($toStepName, 0, strpos($toStepName, '-'))));
         $this->currentStepName = $toStepName;
     }
 
@@ -120,6 +123,7 @@ abstract class WizardComponent extends Component
                 'allStepNames' => $this->stepNames()->toArray(),
                 'allStepsState' => $this->allStepState,
                 'stateClassName' => $this->stateClass(),
+                'currentStepNumber' => $this->currentStepNumber
             ],
         );
     }
@@ -127,8 +131,9 @@ abstract class WizardComponent extends Component
     public function render()
     {
         $currentStepState = $this->getCurrentStepState();
-
-        return view('livewire-wizard::wizard', compact('currentStepState'));
+        $stepName = substr($this->currentStepName, strpos($this->currentStepName, '-') + 2);
+        $steps = $this->stepNames();
+        return view('livewire-wizard::wizard', compact('currentStepState', 'stepName', 'steps'));
     }
 
     /** @return class-string<State> */
