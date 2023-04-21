@@ -10,7 +10,7 @@ use Spatie\LivewireWizard\Support\State;
 abstract class StepComponent extends Component
 {
     use StepAware;
-
+    public array $activities = [];
     public array $allStepNames = [];
     public array $allStepsState = [];
 
