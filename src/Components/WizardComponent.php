@@ -17,11 +17,10 @@ abstract class WizardComponent extends Component
 {
     use MountsWizard;
 
+    public array $activities = [];
     public array $allStepState = [];
     public ?string $currentStepName = null;
-
     public int $currentStepNumber = 1;
-
     protected $listeners = [
         'previousStep',
         'nextStep',
@@ -123,6 +122,7 @@ abstract class WizardComponent extends Component
                 'allStepNames' => $this->stepNames()->toArray(),
                 'allStepsState' => $this->allStepState,
                 'stateClassName' => $this->stateClass(),
+                'activities' => $this->activities,
                 'currentStepNumber' => $this->currentStepNumber
             ],
         );
