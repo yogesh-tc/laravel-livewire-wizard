@@ -18,7 +18,7 @@ trait StepAware
 
         $this->steps = collect($this->allStepNames)
             ->map(function (string $stepName) use (&$currentFound, $currentStepName) {
-                
+
 		$componentName = substr($stepName, strpos($stepName, '-') + 2);
                 $className = Livewire::getClass($componentName);
                 $info = (new $className())->stepInfo();
@@ -26,11 +26,13 @@ trait StepAware
                 $info['step_number'] = intval(trim(substr($stepName, 0, strpos($stepName, '-'))));
 
                 $status = $currentFound ? StepStatus::Next : StepStatus::Previous;
+                $newCurrentStep = $info['step_number'] . ' - '.$currentStepName;
 
-                /*if ($stepNumber++ == $currentNumber) {
+                if ($stepName == $newCurrentStep) {
                     $currentFound = true;
                     $status = StepStatus::Current;
-                }*/
+                }
+                $info['status'] = $status;
 
                 return new Step($stepName, $info, $status);
             })
