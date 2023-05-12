@@ -39,25 +39,24 @@ abstract class WizardComponent extends Component
     {
         $index = 1;
         $steps = collect($this->steps())
-            ->each(function (string $stepClassName) {
-                if (! is_a($stepClassName, StepComponent::class, true)) {
-                    throw InvalidStepComponent::doesNotExtendStepComponent(static::class, $stepClassName);
+            ->each(function (array $step) {
+                if (! is_a($step['class'], StepComponent::class, true)) {
+                    throw InvalidStepComponent::doesNotExtendStepComponent(static::class, $step['class']);
                 }
             })
-            ->map(function (string $stepClassName) use(&$index) {
-                $alias = Livewire::getAlias($stepClassName);
+            ->map(function (array $step) use(&$index) {
+                $alias = Livewire::getAlias($step['class']);
 
                 if (is_null($alias)) {
-                    throw InvalidStepComponent::notRegisteredWithLivewire(static::class, $stepClassName);
+                    throw InvalidStepComponent::notRegisteredWithLivewire(static::class, $step['class']);
                 }
 
-                return $index++ . ' - '. $alias;
+                return $step['name'];
             });
 
         if ($steps->isEmpty()) {
             throw NoStepsReturned::make(static::class);
         }
-
         return $steps;
     }
 
