@@ -135,6 +135,30 @@ abstract class WizardComponent extends Component
         return view('livewire-wizard::wizard', compact('currentStepState', 'stepName', 'steps'));
     }
 
+    public function getSteps(){
+        $currentStepName = $this->currentStepName;
+        return collect($this->stepNames())
+            ->map(function (string $stepName) use (&$currentFound, $currentStepName) {
+
+                $componentName = substr($stepName, strpos($stepName, '-') + 2);
+                $className = Livewire::getClass($componentName);
+                $info = (new $className())->stepInfo();
+
+                $info['step_number'] = intval(trim(substr($stepName, 0, strpos($stepName, '-'))));
+
+                $status = $currentFound ? StepStatus::Next : StepStatus::Previous;
+
+                if ($stepName == $currentStepName) {
+                    $currentFound = true;
+                    $status = StepStatus::Current;
+                }
+                $info['status'] = $status;
+
+                return new Step($stepName, $info, $status);
+            })
+            ->toArray();
+    }
+
     /** @return class-string<State> */
     public function stateClass(): string
     {
