@@ -12,6 +12,8 @@ use Spatie\LivewireWizard\Exceptions\NoPreviousStep;
 use Spatie\LivewireWizard\Exceptions\NoStepsReturned;
 use Spatie\LivewireWizard\Exceptions\StepDoesNotExist;
 use Spatie\LivewireWizard\Support\State;
+use Spatie\LivewireWizard\Enums\StepStatus;
+use Spatie\LivewireWizard\Support\Step;
 
 abstract class WizardComponent extends Component
 {
